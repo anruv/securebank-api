@@ -1,0 +1,19 @@
+name: Insecure CI Demo
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: ./mvnw clean package -DskipTests
