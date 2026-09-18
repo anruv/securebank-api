@@ -37,3 +37,10 @@ jobs:
           test -f target/bom.json
           echo "SBOM generated successfully"
           shasum -a 256 target/bom.json
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: securebank-sbom
+          path: target/bom.json
+          if-no-files-found: error
