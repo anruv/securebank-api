@@ -1,0 +1,39 @@
+name: SBOM
+
+on:
+  push:
+    branches:
+      - sbom-security-test
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  generate-sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build SecureBank
+        run: ./mvnw clean package -DskipTests
+
+      - name: Generate CycloneDX SBOM
+        run: ./mvnw org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DincludeTestScope=false
+
+      - name: Verify SBOM
+        run: |
+          test -f target/bom.json
+          echo "SBOM generated successfully"
+          shasum -a 256 target/bom.json
